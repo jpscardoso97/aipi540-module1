@@ -1,1 +1,5 @@
 # Project Dependencies
+tensorflow==2.15.0
+scikit-learn==1.4.0
+matplotlib==3.8.2
+Pillow==10.2.0
