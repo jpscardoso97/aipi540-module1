@@ -38,7 +38,7 @@ train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True)
 val_loader = DataLoader(val_dataset, batch_size=4, shuffle=False)
 
 # Load the pre-trained model, without the top layer
-base_model = models.resnet50(pretrained=True)
+base_model = models.resnet50(weights="ResNet50_Weights.DEFAULT")
 for param in base_model.parameters():
     param.requires_grad = False
 
