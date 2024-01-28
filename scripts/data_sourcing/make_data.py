@@ -9,6 +9,10 @@ import unicodedata
 
 from bs4 import BeautifulSoup
 
+use_low_res_images = False
+
+image_size = use_low_res_images and "medium" or "original"
+
 curr_dir = os.getcwd()
 
 file_name = 'snakes.txt'
@@ -156,7 +160,7 @@ if load_images:
             for o in observations:
                 photos = o['photos']
                 for p in photos:
-                    image_url = p['url'].replace('square.', 'medium.')
+                    image_url = p['url'].replace('square.', image_size + '.')
                     extension = image_url.split('/')[-1].split('.')[1]
                     filename = f"{p['id']}.{extension}"
                     image_urls[filename] = image_url
