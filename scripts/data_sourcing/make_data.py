@@ -5,11 +5,9 @@ import aiofiles
 import json
 import os
 import requests
-import shutil
 import unicodedata
 
 from bs4 import BeautifulSoup
-from sklearn.model_selection import train_test_split
 
 curr_dir = os.getcwd()
 

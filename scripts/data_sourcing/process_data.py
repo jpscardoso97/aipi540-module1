@@ -20,7 +20,13 @@ folders = [f for f in os.listdir(raw_data_path) if os.path.isdir(os.path.join(ra
 for folder in folders:
     # Get the list of all files in the folder
     files = os.listdir(os.path.join(raw_data_path, folder))
-    
+    print(f"Processing {folder} folder")
+    print(f"Found {len(files)} images")
+
+    if len(files) == 0:
+        print(f"Skipping {folder} folder, no images found")
+        continue
+
     corr_img = 0
 
     # Remove corrupted images
@@ -29,10 +35,13 @@ for folder in folders:
             img = Image.open(os.path.join(raw_data_path, folder, file))
         except :
             os.remove(os.path.join(raw_data_path, folder, file))
+            files.remove(file)
             corr_img += 1
 
     if corr_img > 0:
         print(f"Removed {corr_img} corrupted images from {folder} folder")
+
+    print(f"Splitting {len(files)} images into train and test sets")
 
     # Split the files into train and test sets
     train_files, test_files = train_test_split(files, test_size=0.2, random_state=42)
