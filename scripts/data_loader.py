@@ -21,15 +21,19 @@ def find_max_image_size(data_dir):
                     max_height = max(max_height, height)
     return max_width, max_height
 
-def load_data(data_dir, batch_size=32, resize=False, target_size=(224, 224)):
+def load_data(data_dir, batch_size=32, customized_size=False, target_size=(224, 224)):
     '''
-        If resize is True, resize the image to target_size, otherwise pad the image to the max size
+        If customized_size is False, the max image size will be used.
     '''
-    if resize:
+    if customized_size:
         transform = transforms.Compose([
-            transforms.Resize(target_size),
-            transforms.Lambda(lambda x: transforms.functional.pad(x, (0, 0, target_size[0] - x.size[0], target_size[1] - x.size[1]), fill=0)),
-            transforms.CenterCrop(target_size),
+            # transforms.Resize(target_size),
+            transforms.Lambda(lambda x: transforms.functional.pad(x, (
+                (target_size[0] - x.size[0]) // 2, 
+                (target_size[1] - x.size[1]) // 2, 
+                (target_size[0] - x.size[0]) - ((target_size[0] - x.size[0]) // 2), 
+                (target_size[1] - x.size[1]) - ((target_size[1] - x.size[1]) // 2)
+            ), fill=0)),
             transforms.ToTensor(),
             # Use ImageNet mean and std temporarily, we can also calculate the mean and std of our dataset
             # transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]) 
@@ -39,8 +43,14 @@ def load_data(data_dir, batch_size=32, resize=False, target_size=(224, 224)):
         max_size = (max_width, max_height)
         print('Max image size: {} x {}'.format(max_size[0], max_size[1]))
         transform = transforms.Compose([
-            transforms.Resize(max_size),
-            transforms.Lambda(lambda x: transforms.functional.pad(x, (0, 0, max_size[0] - x.size[0], max_size[1] - x.size[1]), fill=0)),
+            # transforms.Resize(max_size),
+            # transforms.Lambda(lambda x: transforms.functional.pad(x, (0, 0, max_size[0] - x.size[0], max_size[1] - x.size[1]), fill=0)),
+            transforms.Lambda(lambda x: transforms.functional.pad(x, (
+                (max_size[0] - x.size[0]) // 2, 
+                (max_size[1] - x.size[1]) // 2, 
+                (max_size[0] - x.size[0]) - ((max_size[0] - x.size[0]) // 2), 
+                (max_size[1] - x.size[1]) - ((max_size[1] - x.size[1]) // 2)
+            ), fill=0)),
             transforms.ToTensor(),
             # Use ImageNet mean and std temporarily, we can also calculate the mean and std of our dataset
             # transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
@@ -78,14 +88,15 @@ def load_data(data_dir, batch_size=32, resize=False, target_size=(224, 224)):
     return loaders
 
 # Usage example
-if '__name__' == '__main__':
-    data_dir = '../data/snakes/'
+if __name__ == '__main__':
+    print('Loading data...')
+    data_dir = './data/snakes/'
 
     resize_option = False
     # Used if resize_option is True
     target_size = (224, 224)
 
-    loaders = load_data(data_dir, resize=resize_option, target_size=target_size)
+    loaders = load_data(data_dir, customized_size=resize_option, target_size=target_size)
 
     print('Number of training samples: {}'.format(len(loaders['train'].sampler)))
     print('Number of validation samples: {}'.format(len(loaders['valid'].sampler)))
