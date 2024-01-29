@@ -34,8 +34,9 @@ for folder in folders:
         try:
             img = Image.open(os.path.join(raw_data_path, folder, file))
         except :
-            os.remove(os.path.join(raw_data_path, folder, file))
-            files.remove(file)
+            #os.remove(os.path.join(raw_data_path, folder, file))
+            #files.remove(file)
+            print(f"Removed corrupted image {file}")
             corr_img += 1
 
     if corr_img > 0:

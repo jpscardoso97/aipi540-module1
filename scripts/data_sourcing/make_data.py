@@ -99,14 +99,14 @@ else:
 
 async def download_file(session, folder, url, fname):
     try:
+        fpath = os.path.join(folder, fname)
         # Skip if file already exists
-        if os.path.exists(os.path.join(folder, fname)):
+        if os.path.exists(fpath):
             print(f"File {fname} already exists, skipping...")
             return
             
         async with session.get(url) as response:
             if response.status == 200:
-                fpath = os.path.join(folder, fname)
                 async with aiofiles.open(fpath, "wb") as f:
                     await f.write(await response.read())
                     print(f"Downloaded {url} to {fpath}")
