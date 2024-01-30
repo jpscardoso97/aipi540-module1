@@ -27,21 +27,6 @@ for folder in folders:
         print(f"Skipping {folder} folder, no images found")
         continue
 
-    corr_img = 0
-
-    # Remove corrupted images
-    for file in files:
-        try:
-            img = Image.open(os.path.join(raw_data_path, folder, file))
-        except :
-            #os.remove(os.path.join(raw_data_path, folder, file))
-            #files.remove(file)
-            print(f"Removed corrupted image {file}")
-            corr_img += 1
-
-    if corr_img > 0:
-        print(f"Removed {corr_img} corrupted images from {folder} folder")
-
     print(f"Splitting {len(files)} images into train and test sets")
 
     # Split the files into train and test sets
