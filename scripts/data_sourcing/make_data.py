@@ -9,7 +9,7 @@ import unicodedata
 
 from bs4 import BeautifulSoup
 
-use_low_res_images = False
+use_low_res_images = True
 
 image_size = use_low_res_images and "medium" or "original"
 
@@ -23,7 +23,6 @@ def get_file_path(fname):
 
 # Get snake species
 if not os.path.exists(file_path):
-
     url = 'https://herpsofnc.org/snakes/'
     response = requests.get(url)
     soup = BeautifulSoup(response.content, 'html.parser')
