@@ -9,7 +9,7 @@ import torch.nn as nn
 import torch.optim as optim
 import logging
 import sys
-sys.path.append('../../scripts')
+sys.path.append('../../')
 from data_loader import load_data
 
 
@@ -17,7 +17,7 @@ from data_loader import load_data
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Load in data from data_loader.py
-data_dir = "../../data/raw"
+data_dir = "../../../data/raw"
 resize_option = False
 loaders = load_data(data_dir, customized_size=resize_option)
 
