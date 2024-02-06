@@ -7,6 +7,7 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
+import logging
 import sys
 sys.path.append('../../scripts')
 from data_loader import load_data
@@ -84,6 +85,10 @@ print(f"Total Parameters: {total_params}")
 
 # In[52]:
 
+logging.basicConfig(filename='cnn.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+# Create a logger
+logger = logging.getLogger(__name__)
 
 num_epochs = 20
 for epoch in range(num_epochs):
@@ -117,7 +122,7 @@ for epoch in range(num_epochs):
             correct += (predicted == labels).sum().item()
 
     accuracy = correct / total
-
+    logger.info(f'Epoch {epoch + 1}/{num_epochs}, Loss: {average_loss:.4f}, Validation Accuracy: {accuracy:.2%}')
     print(f'Epoch {epoch + 1}/{num_epochs}, Loss: {average_loss:.4f}, Validation Accuracy: {accuracy:.2%}')
 
 
