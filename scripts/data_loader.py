@@ -21,7 +21,7 @@ def find_max_image_size(data_dir):
                     max_height = max(max_height, height)
     return max_width, max_height
 
-def load_data(data_dir, batch_size=32, customized_size=False, target_size=(224, 224)):
+def load_data(data_dir, batch_size=16, customized_size=False, target_size=(224, 224)):
     '''
         If customized_size is False, the max image size will be used.
     '''
