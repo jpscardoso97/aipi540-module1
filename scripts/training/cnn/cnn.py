@@ -1,36 +1,64 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[2]:
+# In[4]:
 
 
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import logging
 import sys
-sys.path.append('../../')
-from data_loader import load_data
+import logging
+import torchvision.transforms as transforms
+from torchvision.datasets import ImageFolder
+from torch.utils.data import DataLoader, random_split
+# sys.path.append('../../scripts')
+# from data_loader import load_data
 
 
 # Set the device (use GPU if available)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Load in data from data_loader.py
-data_dir = "../../../data/raw"
-resize_option = False
-loaders = load_data(data_dir, customized_size=resize_option)
+data_dir = "../../data/raw"
+# resize_option = False
+# loaders = load_data(data_dir, customized_size=resize_option)
+
+# Transformations
+train_transform = transforms.Compose([
+    transforms.RandomResizedCrop(224),
+    transforms.RandomHorizontalFlip(),
+    transforms.ToTensor(),
+])
+
+val_transform = transforms.Compose([
+    transforms.Resize(256),
+    transforms.CenterCrop(224),
+    transforms.ToTensor(),
+])
+
+# Load the dataset
+dataset = ImageFolder(data_dir, transform=train_transform)
+
+# Split the dataset into train and validation sets
+train_size = int(0.8 * len(dataset))
+val_size = len(dataset) - train_size
+train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
+
+batch_size = 4
+train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
 
-# In[3]:
+# In[5]:
 
 
-print('Number of training samples: {}'.format(len(loaders['train'].sampler)))
-print('Number of validation samples: {}'.format(len(loaders['valid'].sampler)))
-print('Number of test samples: {}'.format(len(loaders['test'].sampler)))
+print('Number of training samples: {}'.format(len(train_loader.sampler)))
+print('Number of validation samples: {}'.format(len(val_loader.sampler)))
+# print('Number of test samples: {}'.format(len(loaders['test'].sampler)))
 
 
-# In[49]:
+# In[22]:
 
 
 import torch.nn as nn
@@ -41,32 +69,39 @@ class CNN(nn.Module):
         super(CNN, self).__init__()
 
         # Convolutional layers
-        self.conv1 = nn.Conv2d(3, 16, kernel_size=3, stride=1, padding=1)
+        self.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1)
         self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
 
-        self.conv2 = nn.Conv2d(16, 32, kernel_size=3, stride=1, padding=1)
+        self.conv2 = nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1)
         self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
 
+        self.conv3 = nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=1)
+        self.pool3 = nn.MaxPool2d(kernel_size=2, stride=2)
+
         # Fully connected layers
-        self.flatten = nn.Flatten()
         self.dropout = nn.Dropout(0.2)
-        #self.fc1 = nn.Linear(32 * 125 * 125, 64)
-        self.fc1 = nn.Linear(8388608, 64)
-        self.fc2 = nn.Linear(64, num_classes)
+        self.fc = nn.Linear(128 * 56 * 56, 38)
 
     def forward(self, x):
-        x = self.pool1(F.relu(self.conv1(x)))
-        x = self.pool2(F.relu(self.conv2(x)))
-
-        x = self.flatten(x)
+        # Convolutional layers
+        x = nn.ReLU()(self.conv1(x))
+        x = self.pool1(x)
+        x = nn.ReLU()(self.conv2(x))
+        x = self.pool2(x)
+        
+        # Flatten
+        x = x.view(x.size(0), -1)
+        
+        # Dropout
         x = self.dropout(x)
-        x = F.relu(self.fc1(x))
-        x = self.fc2(x)
-
+        
+        # Fully connected layer
+        x = self.fc(x)
+        
         return x
 
 
-# In[50]:
+# In[23]:
 
 
 # Initialize the model
@@ -77,26 +112,28 @@ criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 
-# In[51]:
+# In[24]:
 
 
 total_params = sum(p.numel() for p in model.parameters())
 print(f"Total Parameters: {total_params}")
 
 
-# In[52]:
+# In[25]:
+
+
+num_epochs = 20
 
 logging.basicConfig(filename='cnn.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Create a logger
 logger = logging.getLogger(__name__)
 
-num_epochs = 20
 for epoch in range(num_epochs):
     model.train()
     total_loss = 0.0
 
-    for inputs, labels in loaders['train']:
+    for inputs, labels in train_loader:
         inputs, labels = inputs.to(device), labels.to(device)
 
         optimizer.zero_grad()
@@ -107,7 +144,7 @@ for epoch in range(num_epochs):
 
         total_loss += loss.item()
 
-    average_loss = total_loss / len(loaders['train'])
+    average_loss = total_loss / len(train_loader)
 
     # Validation
     model.eval()
@@ -115,7 +152,7 @@ for epoch in range(num_epochs):
     total = 0
 
     with torch.no_grad():
-        for inputs, labels in loaders['test']:
+        for inputs, labels in val_loader:
             inputs, labels = inputs.to(device), labels.to(device)
             outputs = model(inputs)
             _, predicted = torch.max(outputs, 1)
@@ -124,6 +161,7 @@ for epoch in range(num_epochs):
 
     accuracy = correct / total
     logger.info(f'Epoch {epoch + 1}/{num_epochs}, Loss: {average_loss:.4f}, Validation Accuracy: {accuracy:.2%}')
+
     print(f'Epoch {epoch + 1}/{num_epochs}, Loss: {average_loss:.4f}, Validation Accuracy: {accuracy:.2%}')
 
 
