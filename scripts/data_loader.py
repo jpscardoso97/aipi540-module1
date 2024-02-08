@@ -25,6 +25,7 @@ def load_data(data_dir, batch_size=16, customized_size=False, target_size=(224, 
     '''
         If customized_size is False, the max image size will be used.
     '''
+    print(f"Batch Size: {batch_size}")
     if customized_size:
         transform = transforms.Compose([
             # transforms.Resize(target_size),
