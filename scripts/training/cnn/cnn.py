@@ -50,7 +50,8 @@ class CNN(nn.Module):
         # Fully connected layers
         self.flatten = nn.Flatten()
         self.dropout = nn.Dropout(0.2)
-        self.fc1 = nn.Linear(32 * 125 * 125, 64)
+        #self.fc1 = nn.Linear(32 * 125 * 125, 64)
+        self.fc1 = nn.Linear(8388608, 64)
         self.fc2 = nn.Linear(64, num_classes)
 
     def forward(self, x):
