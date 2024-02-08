@@ -17,6 +17,7 @@ from torch.utils.data import DataLoader, random_split
 
 
 # Set the device (use GPU if available)
+print("CUDA available: ", torch.cuda.is_available())
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Load in data from data_loader.py
