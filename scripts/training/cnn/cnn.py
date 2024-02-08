@@ -20,7 +20,7 @@ from torch.utils.data import DataLoader, random_split
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Load in data from data_loader.py
-data_dir = "../../data/raw"
+data_dir = "../../../data/raw"
 # resize_option = False
 # loaders = load_data(data_dir, customized_size=resize_option)
 
