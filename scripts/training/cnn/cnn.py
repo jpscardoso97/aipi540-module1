@@ -1,13 +1,7 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[4]:
-
-
+# %%
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import sys
 import logging
 import torchvision.transforms as transforms
 from torchvision.datasets import ImageFolder
@@ -17,14 +11,10 @@ from torch.utils.data import DataLoader, random_split
 
 
 # Set the device (use GPU if available)
-print("CUDA available: ", torch.cuda.is_available())
-if torch.cuda.is_available():
-    cuda_version = torch.version.cuda
-    print("CUDA Version:", cuda_version)
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-device = "cpu"
+
 # Load in data from data_loader.py
-data_dir = "../../../data/raw"
+data_dir = "../../data/raw"
 # resize_option = False
 # loaders = load_data(data_dir, customized_size=resize_option)
 
@@ -53,61 +43,45 @@ batch_size = 4
 train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
 val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
-
-# In[5]:
-
-
+# %%
 print('Number of training samples: {}'.format(len(train_loader.sampler)))
 print('Number of validation samples: {}'.format(len(val_loader.sampler)))
 # print('Number of test samples: {}'.format(len(loaders['test'].sampler)))
 
+# %%
+import torch
+from torch.nn import Module, Sequential, Conv2d, BatchNorm2d, ReLU, MaxPool2d, Linear
 
-# In[22]:
-
-
-import torch.nn as nn
-import torch.nn.functional as F
-
-class CNN(nn.Module):
-    def __init__(self, num_classes=38):
+class CNN(Module):   
+    def __init__(self):
         super(CNN, self).__init__()
 
-        # Convolutional layers
-        self.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1)
-        self.pool1 = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.cnn_layers = Sequential(
+            # Defining a 2D convolution layer
+            Conv2d(3, 16, kernel_size=3, stride=1, padding=1),
+            BatchNorm2d(16),
+            ReLU(inplace=True),
+            MaxPool2d(kernel_size=2, stride=2),
+            # Defining another 2D convolution layer
+            Conv2d(16, 16, kernel_size=3, stride=1, padding=1),
+            BatchNorm2d(16),
+            ReLU(inplace=True),
+            MaxPool2d(kernel_size=2, stride=2),
+        )
 
-        self.conv2 = nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1)
-        self.pool2 = nn.MaxPool2d(kernel_size=2, stride=2)
+        self.linear_layers = Sequential(
+            Linear(50176, 38)
+        )
 
-        self.conv3 = nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=1)
-        self.pool3 = nn.MaxPool2d(kernel_size=2, stride=2)
-
-        # Fully connected layers
-        self.dropout = nn.Dropout(0.2)
-        self.fc = nn.Linear(128 * 56 * 56, 38)
-
+    # Defining the forward pass    
     def forward(self, x):
-        # Convolutional layers
-        x = nn.ReLU()(self.conv1(x))
-        x = self.pool1(x)
-        x = nn.ReLU()(self.conv2(x))
-        x = self.pool2(x)
-        
-        # Flatten
+        x = self.cnn_layers(x)
         x = x.view(x.size(0), -1)
-        
-        # Dropout
-        x = self.dropout(x)
-        
-        # Fully connected layer
-        x = self.fc(x)
-        
+        x = self.linear_layers(x)
         return x
 
 
-# In[23]:
-
-
+# %%
 # Initialize the model
 model = CNN().to(device)
 
@@ -115,17 +89,11 @@ model = CNN().to(device)
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-
-# In[24]:
-
-
+# %%
 total_params = sum(p.numel() for p in model.parameters())
 print(f"Total Parameters: {total_params}")
 
-
-# In[25]:
-
-
+# %%
 num_epochs = 20
 
 logging.basicConfig(filename='cnn.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -168,10 +136,8 @@ for epoch in range(num_epochs):
 
     print(f'Epoch {epoch + 1}/{num_epochs}, Loss: {average_loss:.4f}, Validation Accuracy: {accuracy:.2%}')
 
-
-# In[ ]:
-
-
+# %%
 # Saving model
 torch.save(model.state_dict(), 'simple_cnn_model.pth')
+
 
