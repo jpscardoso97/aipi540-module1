@@ -1,73 +1,11 @@
 import os
-import subprocess
-import requests
 import sys
 
 HOME = os.getcwd()
 print(HOME)
 
-# %cd {HOME}
-# !git clone https://github.com/IDEA-Research/GroundingDINO.git
-# %cd {HOME}/GroundingDINO
-# !pip install -q -e .
-
-# Define the repository URL and the directory name for cloning
-repo_url = "https://github.com/IDEA-Research/GroundingDINO.git"
-repo_dir = "GroundingDINO"
-
-# Define the HOME directory path
 home_dir = HOME
-
-# Change directory to HOME
-os.chdir(home_dir)
-
-# Clone the repository using subprocess to call the git command
-subprocess.run(["git", "clone", repo_url])
-
-# Change directory to the cloned repository
-os.chdir(os.path.join(home_dir, repo_dir))
-
-# Install the package using subprocess to call the pip command
-subprocess.run(["pip", "install", "-q", "-e", "."])
-
-CONFIG_PATH = os.path.join(HOME, "GroundingDINO/groundingdino/config/GroundingDINO_SwinT_OGC.py")
-print(CONFIG_PATH, "; exist:", os.path.isfile(CONFIG_PATH))
-
-# %cd {HOME}
-# !mkdir {HOME}/weights
-# %cd {HOME}/weights
-
-# !wget -q https://github.com/IDEA-Research/GroundingDINO/releases/download/v0.1.0-alpha/groundingdino_swint_ogc.pth
-
-file_url = "https://github.com/IDEA-Research/GroundingDINO/releases/download/v0.1.0-alpha/groundingdino_swint_ogc.pth"
-
-weights_dir = os.path.join(home_dir, "weights")
-
-# Create the weights directory if it does not exist
-os.makedirs(weights_dir, exist_ok=True)
-
-# Define the path to save the downloaded file
-file_path = os.path.join(weights_dir, "groundingdino_swint_ogc.pth")
-
-# Download the file with a stream to avoid loading it all into memory at once
-response = requests.get(file_url, stream=True)
-
-# Check if the request was successful
-if response.status_code == 200:
-    with open(file_path, 'wb') as f:
-        for chunk in response.iter_content(chunk_size=1024): 
-            # Filter out keep-alive new chunks
-            if chunk:
-                f.write(chunk)
-    print("Download completed successfully!")
-else:
-    print(f"Download failed with status code: {response.status_code}")
-
-WEIGHTS_NAME = "groundingdino_swint_ogc.pth"
-WEIGHTS_PATH = os.path.join(HOME, "weights", WEIGHTS_NAME)
-print(WEIGHTS_PATH, "; exist:", os.path.isfile(WEIGHTS_PATH))
-
-# %cd {HOME}/GroundingDINO
+repo_dir = "GroundingDINO"
 os.chdir(os.path.join(home_dir, repo_dir))
 print(os.getcwd())
 
@@ -76,6 +14,13 @@ sys.path.append(os.path.join(home_dir, repo_dir))
 
 from groundingdino.util.inference import load_model, load_image, predict, annotate
 from groundingdino.util.inference import Model
+
+CONFIG_PATH = os.path.join(HOME, "GroundingDINO/groundingdino/config/GroundingDINO_SwinT_OGC.py")
+WEIGHTS_NAME = "groundingdino_swint_ogc.pth"
+WEIGHTS_PATH = os.path.join(HOME, "weights", WEIGHTS_NAME)
+print(WEIGHTS_PATH, "; exist:", os.path.isfile(WEIGHTS_PATH))
+
+
 
 model = load_model(CONFIG_PATH, WEIGHTS_PATH)
 
@@ -159,7 +104,6 @@ RAW_DATA_PATH = os.path.join(HOME, "../../data/raw")
 # WIP - TODO: iterate over all the images and crop the snakes into new files. 
 for root, dirs, files in os.walk(RAW_DATA_PATH):
     for file in files:
-        print(file)
         img_path = os.path.join(root, file)
         print(img_path)
         box = get_bounding_box(img_path)
