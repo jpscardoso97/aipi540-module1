@@ -32,7 +32,7 @@ def load_data(data_dir, batch_size=32, customized_size=False, target_size=(224, 
 
     # Splitting the dataset into training, validation, and testing
     num_data = len(dataset)
-    print('Number of data: {}'.format(num_data))
+    print('Number of datapoints: {}'.format(num_data))
     indices = list(range(num_data))
     split_train = int(0.6 * num_data)
     split_val = int(0.8 * num_data)
