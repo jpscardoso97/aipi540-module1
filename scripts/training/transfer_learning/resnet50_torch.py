@@ -1,10 +1,15 @@
+import sys
 import torch
 import torchvision
-from torchvision import models, transforms
-from torch.utils.data import DataLoader
-from torchvision.datasets import ImageFolder
 import torch.nn as nn
 import torch.optim as optim
+
+from torchvision.datasets import ImageFolder
+from torchvision import models, transforms
+from torch.utils.data import DataLoader
+
+sys.path.append('../../')
+from data_loader import load_data
 
 print("PyTorch version:", torch.__version__)
 
@@ -23,19 +28,16 @@ train_transforms = transforms.Compose([
 
 # Just normalization for validation
 val_transforms = transforms.Compose([
-    transforms.Resize(256),
-    transforms.CenterCrop(224),
     transforms.ToTensor(),
     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 ])
 
-# Datasets
-train_dataset = ImageFolder('../../data/processed/train', transform=train_transforms)
-val_dataset = ImageFolder('../../data/processed/test', transform=val_transforms)
+data_dir = "../../../data/raw"
 
 # Dataloaders
-train_loader = DataLoader(train_dataset, batch_size=4, shuffle=True)
-val_loader = DataLoader(val_dataset, batch_size=4, shuffle=False)
+loaders = load_data(data_dir, customized_size=False)
+train_loader = loaders['train']
+val_loader = loaders['valid']
 
 # Load the pre-trained model, without the top layer
 base_model = models.resnet50(weights="ResNet50_Weights.DEFAULT")
