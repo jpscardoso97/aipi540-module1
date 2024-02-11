@@ -8,6 +8,11 @@ import subprocess
 import urllib.request
 import time
 from torchvision.ops import box_convert
+from scripts.inference.predict import Predictor
+import sys
+sys.path.append(r'C:\Users\lesli\Documents\Duke\Masters\AIPI540\aipi540-module1\utils')
+import class_mapping
+
 
 # Main script for the project
 def main():
@@ -63,10 +68,23 @@ def main():
             cropped_image, logit_confidence = crop_image(image_source, boxes, logits)
             # Display the cropped image
             st.image(cropped_image, caption='Cropped Image', use_column_width=True)
-            st.write(f"Segmentation Confidence: {logit_confidence}")
+            st.write(f"Snake Segmentation Confidence: {logit_confidence}")
+
+            predict_image_and_display(cropped_image)
             
         elif presegmentation == "No":
-            print("no")
+            predict_image_and_display(image)
+
+def predict_image_and_display(image):
+    predictor = Predictor()
+    preds = predictor.predict(image)
+
+    for i, c in enumerate(class_mapping.map_classes()):
+        if preds[i] == 1:
+            st.markdown("## Class Predictions:")
+            st.markdown(f"### {c}")
+            return c
+    return None
 
 def crop_image(image_source: np.ndarray, boxes: torch.Tensor, logits: torch.Tensor) -> np.ndarray:
     max_index = torch.argmax(logits)
