@@ -1,15 +1,13 @@
 # Main script for the project
 import streamlit as st
-from PIL import Image, ImageDraw
+from PIL import Image
 import os
 import torch
-import cv2
 import numpy as np
-import supervision as sv
 import subprocess
 import urllib.request
 import time
-import matplotlib.pyplot as plt
+from torchvision.ops import box_convert
 
 # Main script for the project
 def main():
@@ -26,7 +24,7 @@ def main():
         presegmentation = st.radio("Perform Pre-Segmentation using GroundingDINO?", ("Yes", "No"), index = None)
         
         if presegmentation == "Yes":
-            from groundingdino.util.inference import load_model, load_image, predict #, annotate, Model
+            from groundingdino.util.inference import load_model, load_image, predict, annotate
 
             # Check if CUDA is available
             #device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -42,20 +40,18 @@ def main():
 
             GROUNDING_DINO_CHECKPOINT_PATH = os.path.join(HOME, "GroundingDINO", "weights", WEIGHTS_NAME)
             print(GROUNDING_DINO_CHECKPOINT_PATH, "; exist:", os.path.isfile(GROUNDING_DINO_CHECKPOINT_PATH))
-
-            
-            #grounding_dino_model = Model(model_config_path=GROUNDING_DINO_CONFIG_PATH, model_checkpoint_path=GROUNDING_DINO_CHECKPOINT_PATH, device=device)
-            
+      
             TEXT_PROMPT = "snake"
             BOX_TRESHOLD = 0.25
             TEXT_TRESHOLD = 0.25
 
             # Display bounding box around snake in image
             start_time = time.time()
-            _, image_np = load_image(uploaded_file)
-            boxes, _, phrases = predict(
+            image_source, image_np_tensor = load_image(uploaded_file)
+            
+            boxes, logits, _ = predict(
                 model=model,
-                image=image_np,
+                image=image_np_tensor,
                 caption=TEXT_PROMPT,
                 box_threshold=BOX_TRESHOLD,
                 text_threshold=TEXT_TRESHOLD,
@@ -64,25 +60,25 @@ def main():
             end_time = time.time()
             st.write(f"Segmentation time: {end_time-start_time:.2f} seconds")
 
-            # Draw bounding boxes on the image
+            cropped_image, logit_confidence = crop_image(image_source, boxes, logits)
+            # Display the cropped image
+            st.image(cropped_image, caption='Cropped Image', use_column_width=True)
+            st.write(f"Segmentation Confidence: {logit_confidence}")
             
         elif presegmentation == "No":
             print("no")
 
-# Does not work at the moment
-def draw_boxes(image, boxes):
-    bounded_image = image.copy()
-    draw = ImageDraw.Draw(bounded_image)
-    width, height = bounded_image.size
+def crop_image(image_source: np.ndarray, boxes: torch.Tensor, logits: torch.Tensor) -> np.ndarray:
+    max_index = torch.argmax(logits)
 
-    for box in boxes:
-        xmin, ymin, width, height = box
-        xmax = xmin + width
-        ymax = ymin + height
-        x1, y1, x2, y2 = int(xmin * width), int(ymin * height), int(xmax * width), int(ymax * height)
-        draw.rectangle([x1, y1, x2, y2], outline=(0, 255, 0), width=2)
-        
-    return bounded_image
+    h, w, _ = image_source.shape
+    box = boxes[max_index] * torch.Tensor([w, h, w, h])
+    xyxy = box_convert(boxes=box.unsqueeze(0), in_fmt="cxcywh", out_fmt="xyxy").numpy()
+
+    xmin, ymin, xmax, ymax = xyxy.squeeze().astype(int)
+    cropped_image = image_source[ymin:ymax, xmin:xmax]
+
+    return cropped_image, logits[max_index]
 
 def dinoInstaller():
     HOME = os.getcwd()
