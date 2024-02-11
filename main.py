@@ -107,4 +107,8 @@ def dinoInstaller():
 if __name__ == '__main__':
     
     #dinoInstaller()
+<<<<<<< HEAD
     main()
+=======
+    main()
+>>>>>>> f172ada2ec8deda865e51522fc8edb793b865073
