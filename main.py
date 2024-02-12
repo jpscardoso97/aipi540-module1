@@ -14,6 +14,8 @@ current_dir = os.getcwd()
 utils_dir = os.path.join(current_dir, 'utils')
 sys.path.append(utils_dir)
 import class_mapping
+groundingDINO_dir = os.path.join(os.getcwd(), 'GroundingDINO')
+sys.path.append(groundingDINO_dir)
 
 # Main script for the project
 def main():

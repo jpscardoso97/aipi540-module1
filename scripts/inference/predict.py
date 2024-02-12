@@ -12,7 +12,7 @@ current_directory = os.path.abspath(os.path.dirname(__file__))
 model_path = os.path.join(current_directory, '../../models/transfer_learning-100epoch_withCropped.pth')
 
 class Predictor:
-    def __init__(self, model_path=None):
+    def __init__(self):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model = self.load_model(model_path)
         self.model.eval()
