@@ -12,31 +12,35 @@ import supervision as sv
 
 import cv2
 
-# Define the path to the repository
-HOME = os.getcwd()
+# Define a function using the above code to load the model
+def load_model():
+  '''
+  With the GoundingDINO repository cloned and the model weights downloaded in the same directory as the script,
+  this function loads the model and returns it.
+  '''
 
-home_dir = HOME
-repo_dir = "GroundingDINO"
-os.chdir(os.path.join(home_dir, repo_dir))
+  # Define the path to the repository
+  HOME = os.getcwd()
 
-sys.path.append(os.path.join(home_dir, repo_dir))
+  home_dir = HOME
+  repo_dir = "GroundingDINO"
+  os.chdir(os.path.join(home_dir, repo_dir))
 
-# Load the model
-CONFIG_PATH = os.path.join(HOME, "GroundingDINO/groundingdino/config/GroundingDINO_SwinT_OGC.py")
-WEIGHTS_NAME = "groundingdino_swint_ogc.pth"
-WEIGHTS_PATH = os.path.join(HOME, "weights", WEIGHTS_NAME)
-print(WEIGHTS_PATH, "; exist:", os.path.isfile(WEIGHTS_PATH))
+  sys.path.append(os.path.join(home_dir, repo_dir))
 
-model = load_model(CONFIG_PATH, WEIGHTS_PATH)
+  # Load the model
+  CONFIG_PATH = os.path.join(HOME, "GroundingDINO/groundingdino/config/GroundingDINO_SwinT_OGC.py")
+  print(CONFIG_PATH, "; exist:", os.path.isfile(CONFIG_PATH))
+  WEIGHTS_NAME = "groundingdino_swint_ogc.pth"
+  WEIGHTS_PATH = os.path.join(HOME, "weights", WEIGHTS_NAME)
+  print(WEIGHTS_PATH, "; exist:", os.path.isfile(WEIGHTS_PATH))
 
-GROUNDING_DINO_CONFIG_PATH = os.path.join(HOME, "GroundingDINO/groundingdino/config/GroundingDINO_SwinT_OGC.py")
-print(GROUNDING_DINO_CONFIG_PATH, "; exist:", os.path.isfile(GROUNDING_DINO_CONFIG_PATH))
+  model = load_model(CONFIG_PATH, WEIGHTS_PATH)
 
-GROUNDING_DINO_CHECKPOINT_PATH = os.path.join(HOME, "weights", WEIGHTS_NAME)
-print(GROUNDING_DINO_CHECKPOINT_PATH, "; exist:", os.path.isfile(GROUNDING_DINO_CHECKPOINT_PATH))
+  return model
 
-grounding_dino_model = Model(model_config_path=GROUNDING_DINO_CONFIG_PATH, model_checkpoint_path=GROUNDING_DINO_CHECKPOINT_PATH)
-
+# load the model
+model = load_model()
 
 TEXT_PROMPT = "snake"
 BOX_TRESHOLD = 0.25
