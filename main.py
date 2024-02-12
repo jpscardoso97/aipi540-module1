@@ -14,8 +14,6 @@ current_dir = os.getcwd()
 utils_dir = os.path.join(current_dir, 'utils')
 sys.path.append(utils_dir)
 import class_mapping
-groundingDINO_dir = os.path.join(os.getcwd(), 'GroundingDINO')
-sys.path.append(groundingDINO_dir)
 
 # Main script for the project
 def main():
@@ -32,7 +30,10 @@ def main():
         presegmentation = st.radio("Perform Pre-Segmentation using GroundingDINO?", ("Yes", "No"), index = None)
         
         if presegmentation == "Yes":
-            from GroundingDINO.groundingdino.util.inference import load_model, load_image, predict, annotate
+            current_directory = os.path.abspath(os.path.dirname(__file__))
+            module_directory = os.path.join(current_directory, 'GroundingDINO')
+            sys.path.append(module_directory)
+            from groundingdino.util.inference import load_model, load_image, predict, annotate
 
             # Check if CUDA is available
             #device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
