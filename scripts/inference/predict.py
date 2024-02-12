@@ -9,18 +9,10 @@ from PIL import Image
 from scripts.data_loader import get_padding_transform
 
 current_directory = os.path.abspath(os.path.dirname(__file__))
-<<<<<<< HEAD
-<<<<<<< HEAD
-model_path = os.path.join(current_directory, '../../models/transfer_learning-100epochs.pth')
-=======
 model_path = os.path.join(current_directory, '../../models/transfer_learning-100.pth')
->>>>>>> c9baf41... Added basic implementation of cropping without annotation and testing pipeline
-=======
-model_path = os.path.join(current_directory, '../../models/transfer_learning-100epochs.pth')
->>>>>>> 2e435ea... undid change to Predictor load, updated Predictor model path
 
 class Predictor:
-    def __init__(self):
+    def __init__(self, model_path=None):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model = self.load_model(model_path)
         self.model.eval()
