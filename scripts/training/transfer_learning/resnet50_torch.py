@@ -35,7 +35,9 @@ val_transforms = transforms.Compose([
     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 ])
 
-data_dir = "../../../data/raw"
+# If don't want to use the cropped images by Grounding Dino you can use the raw images
+# data_dir = "../../../data/raw"
+data_dir = "../../../data/cropped"
 
 # Dataloaders
 loaders = load_data(data_dir, customized_size=False)
