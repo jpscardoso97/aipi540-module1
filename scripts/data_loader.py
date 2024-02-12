@@ -25,43 +25,14 @@ def load_data(data_dir, batch_size=4, customized_size=False, target_size=(224, 2
     '''
         If customized_size is False, the max image size will be used.
     '''
-    print(f"Batch Size: {batch_size}")
-    if customized_size:
-        transform = transforms.Compose([
-            # transforms.Resize(target_size),
-            transforms.Lambda(lambda x: transforms.functional.pad(x, (
-                (target_size[0] - x.size[0]) // 2, 
-                (target_size[1] - x.size[1]) // 2, 
-                (target_size[0] - x.size[0]) - ((target_size[0] - x.size[0]) // 2), 
-                (target_size[1] - x.size[1]) - ((target_size[1] - x.size[1]) // 2)
-            ), fill=0)),
-            transforms.ToTensor(),
-            # Use ImageNet mean and std temporarily, we can also calculate the mean and std of our dataset
-            # transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]) 
-        ])
-    else:
-        max_width, max_height = find_max_image_size(data_dir)
-        max_size = (max_width, max_height)
-        print('Max image size: {} x {}'.format(max_size[0], max_size[1]))
-        transform = transforms.Compose([
-            # transforms.Resize(max_size),
-            # transforms.Lambda(lambda x: transforms.functional.pad(x, (0, 0, max_size[0] - x.size[0], max_size[1] - x.size[1]), fill=0)),
-            transforms.Lambda(lambda x: transforms.functional.pad(x, (
-                (max_size[0] - x.size[0]) // 2, 
-                (max_size[1] - x.size[1]) // 2, 
-                (max_size[0] - x.size[0]) - ((max_size[0] - x.size[0]) // 2), 
-                (max_size[1] - x.size[1]) - ((max_size[1] - x.size[1]) // 2)
-            ), fill=0)),
-            transforms.ToTensor(),
-            # Use ImageNet mean and std temporarily, we can also calculate the mean and std of our dataset
-            # transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-        ])
 
+    transform = get_padding_transform(customized_size, target_size) 
+    
     dataset = datasets.ImageFolder(root=data_dir, transform=transform)
 
     # Splitting the dataset into training, validation, and testing
     num_data = len(dataset)
-    print('Number of data: {}'.format(num_data))
+    print('Number of datapoints: {}'.format(num_data))
     indices = list(range(num_data))
     split_train = int(0.6 * num_data)
     split_val = int(0.8 * num_data)
@@ -87,6 +58,23 @@ def load_data(data_dir, batch_size=4, customized_size=False, target_size=(224, 2
     }
 
     return loaders
+
+def get_padding_transform(customized_size=False, target_size=(224, 224)):
+    width, height = target_size
+
+    if customized_size:
+        width, height = find_max_image_size(data_dir)
+        print('Max image size: {} x {}'.format(width, height))
+
+    return transforms.Compose([
+            transforms.Lambda(lambda x: transforms.functional.pad(x, (
+                (width - x.size[0]) // 2, 
+                (height - x.size[1]) // 2, 
+                (width - x.size[0]) - ((width - x.size[0]) // 2), 
+                (height - x.size[1]) - ((height - x.size[1]) // 2)
+            ), fill=0)),
+            transforms.ToTensor(),
+        ])
 
 # Usage example
 if __name__ == '__main__':
