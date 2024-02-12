@@ -1,5 +1,4 @@
 # Project Dependencies
-flask==3.0.2
 keras==2.15.0
 torch==2.1.2
 torchvision==0.16.2

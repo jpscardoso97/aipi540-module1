@@ -12,12 +12,12 @@ Prior to this project there was no way to classify images of the species of snak
 
 This project needs the dependencies defined in "requirements.txt" as well as GPU support for faster training (optional - the saved weights in the repository can be used). 
 Some of the dependencies are: 
-* Flask
 * Keras,
 * PyTorch
 * scikit-learn
 * MatplotLib
 * Pillow  
+* Streamlit
 
 ### Installing
 
