@@ -121,5 +121,5 @@ def dinoInstaller():
 
 if __name__ == '__main__':
     
-    #dinoInstaller()
+    dinoInstaller()
     main()
