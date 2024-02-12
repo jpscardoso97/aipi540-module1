@@ -32,7 +32,7 @@ def main():
         presegmentation = st.radio("Perform Pre-Segmentation using GroundingDINO?", ("Yes", "No"), index = None)
         
         if presegmentation == "Yes":
-            from groundingdino.util.inference import load_model, load_image, predict, annotate
+            from GroundingDINO.groundingdino.util.inference import load_model, load_image, predict, annotate
 
             # Check if CUDA is available
             #device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
