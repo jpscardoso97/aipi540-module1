@@ -109,7 +109,9 @@ def dinoInstaller():
     if not os.path.isdir(os.path.join(HOME, "GroundingDINO")):
         print("Installing GroundingDINO for Image Segmentation")
         subprocess.run(["git", "clone", "https://github.com/IDEA-Research/GroundingDINO.git"])
-        subprocess.run(["pip", "install", "-q", "-e", "./GroundingDINO"])
+        subprocess.run(["cd", "GroundingDINO/"])
+        
+        subprocess.run(["pip", "install", "-q", "-e", "."])
 
     # Create a weights directory if it doesn't exist
     if not os.path.isdir(os.path.join(HOME, "GroundingDINO", "weights")):
