@@ -101,6 +101,7 @@ def crop_image(image_source: np.ndarray, boxes: torch.Tensor, logits: torch.Tens
 
 def dinoInstaller():
     HOME = os.getcwd()
+    print(HOME)
     # Install GroundingDINO from github if it isn't already present
     if not os.path.isdir(os.path.join(HOME, "GroundingDINO")):
         print("Installing GroundingDINO for Image Segmentation")
