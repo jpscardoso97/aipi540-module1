@@ -10,9 +10,12 @@ import time
 from torchvision.ops import box_convert
 from scripts.inference.predict import Predictor
 import sys
-sys.path.append(r'C:\Users\lesli\Documents\Duke\Masters\AIPI540\aipi540-module1\utils')
+current_dir = os.getcwd()
+utils_dir = os.path.join(current_dir, 'utils')
+sys.path.append(utils_dir)
 import class_mapping
-
+segment_dir = os.path.join(curr_dir, 'scripts', 'segmentation')
+import segment_snakes
 
 # Main script for the project
 def main():
