@@ -55,9 +55,6 @@ def get_bounding_box(path):
 
   annotated_frame = annotate(image_source=image_source, boxes=boxes, logits=logits, phrases=phrases)
 
-#   %matplotlib inline
-  # sv.plot_image(annotated_frame, (16, 16))
-
   return boxes[0].numpy()
 
 def get_cropped_image(img_path, box):
@@ -106,7 +103,11 @@ for root, dirs, files in os.walk(RAW_DATA_PATH):
         try:
           box = get_bounding_box(img_path)
           cropped_img = get_cropped_image(img_path, box)
-          cv2.imwrite(img_path, cropped_img)
+
+          # save the cropped image to the data/cropped folder
+          cropped_img_path = img_path.replace("raw", "cropped")
+          cv2.imwrite(cropped_img_path, cropped_img)
+
           flag += 1
           print('Success:', flag)
         except:
