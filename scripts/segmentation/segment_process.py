@@ -4,6 +4,7 @@ import sys
 from groundingdino.util.inference import load_model, load_image, predict, annotate
 from groundingdino.util.inference import Model
 
+
 import torch
 from torchvision.ops import box_convert
 import numpy as np
