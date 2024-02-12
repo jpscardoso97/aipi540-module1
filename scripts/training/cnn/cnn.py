@@ -6,8 +6,6 @@ import logging
 import torchvision.transforms as transforms
 from torchvision.datasets import ImageFolder
 from torch.utils.data import DataLoader, random_split
-# sys.path.append('../../scripts')
-# from data_loader import load_data
 
 
 # Set the device (use GPU if available)
