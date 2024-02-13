@@ -13,16 +13,15 @@ import supervision as sv
 
 import cv2
 
-# Define a function using the above code to load the model
-def load_model():
+HOME = os.getcwd()
+
+def load_DINO_model():
   '''
   With the GoundingDINO repository cloned and the model weights downloaded in the same directory as the script,
   this function loads the model and returns it.
   '''
 
-  # Define the path to the repository
-  HOME = os.getcwd()
-
+  # Define the path to the repository and change the working directory
   home_dir = HOME
   repo_dir = "GroundingDINO"
   os.chdir(os.path.join(home_dir, repo_dir))
@@ -41,7 +40,7 @@ def load_model():
   return model
 
 # load the model
-model = load_model()
+model = load_DINO_model()
 
 TEXT_PROMPT = "snake"
 BOX_TRESHOLD = 0.25
@@ -63,39 +62,34 @@ def get_bounding_box(path):
   return boxes[0].numpy()
 
 def get_cropped_image(img_path, box):
-    import cv2
 
-    center_x_pct = box[0]
-    center_y_pct = box[1]
-    width_pct = box[2]
-    height_pct = box[3]
+  center_x_pct = box[0]
+  center_y_pct = box[1]
+  width_pct = box[2]
+  height_pct = box[3]
 
-    img = cv2.imread(img_path)
+  img = cv2.imread(img_path)
 
-    img_height, img_width, _ = img.shape
+  img_height, img_width, _ = img.shape
 
-    # Convert normalized coordinates to pixel values
-    center_x = int(center_x_pct * img_width)
-    center_y = int(center_y_pct * img_height)
-    width = int(width_pct * img_width)
-    height = int(height_pct * img_height)
+  # Convert normalized coordinates to pixel values
+  center_x = int(center_x_pct * img_width)
+  center_y = int(center_y_pct * img_height)
+  width = int(width_pct * img_width)
+  height = int(height_pct * img_height)
 
-    print("Center:", (center_x, center_y))
-    print("Width:", width)
-    print("Height:", height)
+  print("Center:", (center_x, center_y))
+  print("Width:", width)
+  print("Height:", height)
 
-    x1 = center_x - width // 2
-    x2 = center_x + width // 2
-    y1 = center_y - height // 2
-    y2 = center_y + height // 2
+  x1 = center_x - width // 2
+  x2 = center_x + width // 2
+  y1 = center_y - height // 2
+  y2 = center_y + height // 2
 
-    # print("Cropping image from", (x1, y1), "to", (x2, y2))
+  cropped_img = img[y1:y2, x1:x2]
 
-    cropped_img = img[y1:y2, x1:x2]
-
-    # cv2.imshow(cropped_img)
-
-    return cropped_img
+  return cropped_img
 
 # iterate over all images in the data/raw folder and subfolders and crop the snake
 RAW_DATA_PATH = os.path.join(HOME, "../../data/raw")
@@ -109,12 +103,14 @@ for root, dirs, files in os.walk(RAW_DATA_PATH):
           box = get_bounding_box(img_path)
           cropped_img = get_cropped_image(img_path, box)
 
-          # save the cropped image to the data/cropped folder
-          cropped_img_path = img_path.replace("raw", "cropped")
+          # Create the processed folder to store the cropped images
+          if not os.path.exists(img_path.replace("raw", "processed").rsplit('/', 1)[0]):
+            os.makedirs(img_path.replace("raw", "processed").rsplit('/', 1)[0])
+          
+          cropped_img_path = img_path.replace("raw", "processed")
           cv2.imwrite(cropped_img_path, cropped_img)
-
           flag += 1
-          print('Success:', flag)
+          print('Number of images processed:', flag)
         except:
           print("Error in writing file:", img_path)
           flag += 1
@@ -122,5 +118,3 @@ for root, dirs, files in os.walk(RAW_DATA_PATH):
           with open("error_log.txt", "a") as file:
             file.write("Error in writing file: " + img_path + "\n")
           continue
-        
-            
