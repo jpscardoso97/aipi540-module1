@@ -20,7 +20,8 @@ def load_DINO_model():
   With the GoundingDINO repository cloned and the model weights downloaded in the same directory as the script,
   this function loads the model and returns it.
   '''
-
+  
+  HOME = os.getcwd()
   # Define the path to the repository and change the working directory
   home_dir = HOME
   repo_dir = "GroundingDINO"
