@@ -30,31 +30,27 @@ def load_data(data_dir, batch_size=4, customized_size=False, target_size=(224, 2
     
     dataset = datasets.ImageFolder(root=data_dir, transform=transform)
 
-    # Splitting the dataset into training, validation, and testing
+    # Splitting the dataset into training, validation
     num_data = len(dataset)
     print('Number of datapoints: {}'.format(num_data))
     indices = list(range(num_data))
-    split_train = int(0.6 * num_data)
-    split_val = int(0.8 * num_data)
+    split_train = int(0.8 * num_data)
 
     # Shuffling indices
     np.random.shuffle(indices)
 
     # Creating data samplers
-    train_idx, val_idx, test_idx = indices[:split_train], indices[split_train:split_val], indices[split_val:]
+    train_idx, val_idx = indices[:split_train], indices[split_train:]
     train_sampler = SubsetRandomSampler(train_idx)
     val_sampler = SubsetRandomSampler(val_idx)
-    test_sampler = SubsetRandomSampler(test_idx)
 
     # Creating data loaders
     train_loader = DataLoader(dataset, batch_size=batch_size, sampler=train_sampler)
     val_loader = DataLoader(dataset, batch_size=batch_size, sampler=val_sampler)
-    test_loader = DataLoader(dataset, batch_size=batch_size, sampler=test_sampler)
 
     loaders = {
         'train': train_loader,
-        'valid': val_loader,
-        'test': test_loader
+        'valid': val_loader
     }
 
     return loaders
@@ -89,4 +85,3 @@ if __name__ == '__main__':
 
     print('Number of training samples: {}'.format(len(loaders['train'].sampler)))
     print('Number of validation samples: {}'.format(len(loaders['valid'].sampler)))
-    print('Number of test samples: {}'.format(len(loaders['test'].sampler)))
