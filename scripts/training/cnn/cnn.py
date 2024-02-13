@@ -44,7 +44,6 @@ val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 # %%
 print('Number of training samples: {}'.format(len(train_loader.sampler)))
 print('Number of validation samples: {}'.format(len(val_loader.sampler)))
-# print('Number of test samples: {}'.format(len(loaders['test'].sampler)))
 
 # %%
 import torch.nn as nn
