@@ -36,6 +36,9 @@ def load_data(data_dir, batch_size=4, customized_size=False, target_size=(224, 2
     indices = list(range(num_data))
     split_train = int(0.8 * num_data)
 
+    # set random seed
+    np.random.seed(42)
+
     # Shuffling indices
     np.random.shuffle(indices)
 

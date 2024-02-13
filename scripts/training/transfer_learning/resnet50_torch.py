@@ -6,13 +6,17 @@ import torchvision
 import torch.nn as nn
 import torch.optim as optim
 
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score
 from torchvision.datasets import ImageFolder
 from torchvision import models, transforms
 from torch.utils.data import DataLoader
 
-from ...data_loader import load_data
-from ....utils.early_stopping import EarlyStopping
+# Change the path to the directory where the scripts are located
+sys.path.append('/home/zachxing/AIPI/aipi540-module1')
+sys.path.append('/home/zachxing/AIPI/aipi540-module1/scripts')
+
+from data_loader import load_data
+from utils.early_stopping import EarlyStopping
 
 print("PyTorch version:", torch.__version__)
 
@@ -35,8 +39,6 @@ val_transforms = transforms.Compose([
     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 ])
 
-# If don't want to use the cropped images by Grounding Dino you can use the raw images
-# data_dir = "../../../data/raw"
 data_dir = "../../../data/cropped"
 
 # Dataloaders
@@ -63,7 +65,7 @@ base_model.train()
 
 early_stopping = EarlyStopping(patience=2, restore_best_weights=True)
 
-for epoch in range(100):
+for epoch in range(80):
     running_loss = 0.0
     for inputs, labels in train_loader:
         inputs, labels = inputs.to(device), labels.to(device)
@@ -120,6 +122,30 @@ plt.ylabel('True label')
 plt.xlabel('Predicted label')
 plt.savefig('confusion_matrix.png')
 
+# Print metrics: accuracy, precision, recall and F1 score
+accuracy = correct / total
+precision = precision_score(trues, preds, average='weighted')
+recall = recall_score(trues, preds, average='weighted')
+f1 = f1_score(trues, preds, average='weighted')
+print(f'Accuracy: {accuracy:.4f}, Precision: {precision:.4f}, Recall: {recall:.4f}, F1 score: {f1:.4f}')
 
-print('Validation accuracy:', correct / total)
+# Save metrics to file
+with open('metrics1.txt', 'w') as f:
+    # write the training data folder
+    f.write(f'Training data folder: {data_dir}\n')
+    f.write('\n')
+    # write the hyperparameters
+    f.write('Hyperparameters\n')
+    f.write('Batch size: 4\n')
+    f.write('Learning rate: 0.001\n')
+    f.write('Momentum: 0.9\n')
+    f.write('Epochs: 80\n')
+    f.write('\n')
+    # write the metrics
+    f.write('Metrics\n')
+    f.write(f'Accuracy: {accuracy:.4f}\n')
+    f.write(f'Precision: {precision:.4f}\n')
+    f.write(f'Recall: {recall:.4f}\n')
+    f.write(f'F1 score: {f1:.4f}\n')
+
 
