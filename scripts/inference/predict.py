@@ -5,11 +5,13 @@ import torch.nn as nn
 import torchvision
 from torchvision import models, transforms
 from PIL import Image
+import io
 
 from scripts.data_loader import get_padding_transform
 
 current_directory = os.path.abspath(os.path.dirname(__file__))
-model_path = os.path.join(current_directory, '../../models/transfer_learning.pth')
+#model_path = os.path.join(current_directory, '../../models/transfer_learning-100epoch_withCropped.pth')
+model_path = os.path.join(current_directory, '../../models/transfer_learning-100epochs.pth')
 
 class Predictor:
     def __init__(self):
@@ -23,10 +25,15 @@ class Predictor:
         ])
 
     def load_model(self, model_path):
-        model = models.resnet50(weights="ResNet50_Weights.DEFAULT")
+        model = models.resnet50(pretrained=False)
         num_ftrs = model.fc.in_features
         model.fc = nn.Linear(num_ftrs, 38)
-        model.load_state_dict(torch.load(model_path, map_location=self.device))
+        
+        # Load the model weights
+        with open(model_path, 'rb') as f:
+            buffer = io.BytesIO(f.read())
+        
+        model.load_state_dict(torch.load(buffer, map_location=self.device))
         model.to(self.device)
         
         return model
