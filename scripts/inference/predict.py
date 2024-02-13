@@ -10,8 +10,8 @@ import io
 from scripts.data_loader import get_padding_transform
 
 current_directory = os.path.abspath(os.path.dirname(__file__))
-model_path = os.path.join(current_directory, '../../models/transfer_learning-100epoch_withCropped.pth')
-#model_path = os.path.join(current_directory, '../../models/transfer_learning-100epochs.pth')
+#model_path = os.path.join(current_directory, '../../models/transfer_learning-100epoch_withCropped.pth')
+model_path = os.path.join(current_directory, '../../models/transfer_learning-100epochs.pth')
 
 class Predictor:
     def __init__(self):
